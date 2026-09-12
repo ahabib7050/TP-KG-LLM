@@ -342,54 +342,9 @@ code supplémentaire** :
 
 ---
 
-## 6. Écarts constatés avec l'énoncé et le tutoriel
 
-### 6.1 `database_="neo4j"` ne fonctionne pas
 
-La base de cette instance Aura porte le **nom de l'instance**, pas `neo4j`. Le code
-d'exemple de l'énoncé (§2.1) lève `DatabaseNotFound`. Correctif : lecture de
-`NEO4J_DATABASE` depuis `.env`, `None` retombant sur la base par défaut.
-
-### 6.2 Bug dans le script du tutoriel : `AS as`
-
-Le script DataCamp écrit `row.away_score AS as`. Or **`as` est un mot réservé** de
-Cypher. Renommé `aws`.
-
-### 6.3 Doublon dans les données sources → nœud incohérent
-
-`results.csv` contient **deux lignes** pour Tahiti–Nouvelle-Calédonie du 17/02/1974,
-avec des scores inversés (2-1 et 1-2). Le `MERGE` fusionne les deux en un seul
-`Match` (49 547 lignes → 49 546 nœuds), mais les relations des **deux** lignes sont
-créées :
-
-```
-score stocké 1-2  │  New Caledonia -[WON]->  match
-score stocké 1-2  │  Tahiti        -[WON]->  match      ← les deux ont « gagné »
-score stocké 1-2  │  New Caledonia -[LOST]-> match
-score stocké 1-2  │  Tahiti        -[LOST]-> match
-```
-
-Illustration exacte de la différence `MERGE`/`CREATE` : `MERGE` dédoublonne les
-**nœuds**, mais les `FOREACH` créent les relations à chaque passage.
-
-### 6.4 Détail : format des identifiants
-
-Les `id` valent `"1872-11-30 00:00:00_Scotland_England"` — l'heure traîne parce que
-le script applique une f-string à un `Timestamp` pandas au lieu du `.strftime()`
-utilisé juste en dessous. Sans conséquence (c'est cohérent entre les trois
-fichiers), mais à savoir si l'on requête un `id` à la main.
-
-### 6.5 Contraintes d'accès AWS Bedrock
-
-| Constat | Conséquence |
-|---|---|
-| Rôle SSO sans `bedrock-mantle:CreateInference` | client `AnthropicBedrockMantle` inutilisable → repli sur `AnthropicBedrock` (`bedrock-runtime:InvokeModel`) |
-| `claude-opus-5` refusé (`INVALID_PAYMENT_INSTRUMENT`) | modèle par défaut visé indisponible → **Opus 4.8** en remplacement |
-| Profils d'inférence `eu.` requis | les identifiants `anthropic.*` nus sont rejetés en débit à la demande ; bénéfice : l'inférence **reste dans l'UE** (résidence des données) |
-
----
-
-## 7. Comparaison V1 / V2 et empreinte
+## 6. Comparaison V1 / V2 et empreinte
 
 | Critère | V1 — patrons | V2 — schema-aware |
 |---|---|---|
@@ -439,7 +394,7 @@ vérification de `cache_read_input_tokens` le prouve.
 
 ---
 
-## 8. Limites et pistes
+## 7. Limites et pistes
 
 - **Cache inopérant sur le routeur V1** (§7). Pistes : router sur un modèle au seuil
   plus bas, ou réduire le vocabulaire injecté (top-N tournois + recherche floue).
@@ -454,7 +409,7 @@ vérification de `cache_read_input_tokens` le prouve.
 
 ---
 
-## 9. Structure du dépôt
+## 8. Structure du dépôt
 
 ```
 data/                          archive Kaggle décompressée (4 CSV)
