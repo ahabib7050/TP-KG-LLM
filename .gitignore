@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Secrets - ne JAMAIS versionner
+.env
+.env.*
+# modele non secret : env.example (versionne)
+
+# Donnees brutes (archive Kaggle)
+data/
+
+# Caches
+__pycache__/
+.pytest_cache/
